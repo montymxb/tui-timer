@@ -1,5 +1,7 @@
 # Terminal Timer & Stopwatch
 
+_Disclosure: This is predominantly AI generated software, specifically from Claude Code. Please keep this in mind when utilizing._
+
 A simple terminal-based stopwatch and countdown timer built with Go and Bubble Tea. Predominantly to provide a way to set timers & use a stopwatch without moving out of the context of the terminal.
 
 ## Features
@@ -63,9 +65,7 @@ timer 2h15m30s
 ### Stopwatch
 
 - Large, easy-to-read time display (HH:MM:SS.CS)
-- Cyan/blue color theme
 - Shows running/paused state
-- Centisecond precision
 
 ### Timer
 
@@ -92,4 +92,3 @@ timer 2h15m30s
 ## License
 
 MIT
-
