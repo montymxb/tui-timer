@@ -2,7 +2,7 @@
 
 _Disclosure: This is predominantly AI generated software, specifically from Claude Code. Please keep this in mind when utilizing._
 
-A simple terminal-based stopwatch and countdown timer built with Go and Bubble Tea. Predominantly to provide a way to set timers & use a stopwatch without moving out of the context of the terminal.
+A simple terminal-based stopwatch and countdown timer built with Go and Bubble Tea. Predominantly to provide a way to set timers & use a stopwatch without moving out of the context of the terminal. Mostly born out of a desire to avoid using the default timer/stopwatch apps on more OS's, which are sometimes a bit clunky to work with.
 
 ## Features
 
