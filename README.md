@@ -13,6 +13,17 @@ A simple terminal-based stopwatch and countdown timer built with Go and Bubble T
 - **Responsive**: Adapts to any terminal size
 - **Simple Controls**: Keyboard shortcuts for all actions
 
+## Screenshots
+
+### Timer in Action
+![Timer Example](imgs/tui1.png)
+
+### Stopwatch Mode
+![Stopwatch Example](imgs/tui2.png)
+
+### Timer Completion
+![Timer Complete](imgs/tui3.png)
+
 ## Installation
 
 ```bash
