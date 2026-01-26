@@ -16,15 +16,20 @@ A simple terminal-based stopwatch and countdown timer built with Go and Bubble T
 ## Screenshots
 
 ### Timer in Action
+
 ![Timer Example](imgs/tui1.png)
 
 ### Stopwatch Mode
+
 ![Stopwatch Example](imgs/tui2.png)
 
 ### Timer Completion
+
 ![Timer Complete](imgs/tui3.png)
 
 ## Installation
+
+### Using Go
 
 ```bash
 # Clone or download the files
@@ -33,6 +38,20 @@ go build -o timer
 
 # Or install directly:
 go install
+```
+
+### Using Nix
+
+```bash
+# Run directly without installing
+nix run github:yourusername/tui-timer
+
+# build locally
+nix build
+./result/bin/timer
+
+# enter dev environment
+nix develop
 ```
 
 ## Usage

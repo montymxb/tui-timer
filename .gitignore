@@ -1,0 +1,11 @@
+# Binaries
+timer
+
+# Nix build results
+result
+result-*
+
+# Go
+*.o
+*.a
+*.so
