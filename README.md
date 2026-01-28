@@ -44,7 +44,7 @@ go install
 
 ```bash
 # Run directly without installing
-nix run github:yourusername/tui-timer
+nix run github:montymxb/tui-timer
 
 # build locally
 nix build
