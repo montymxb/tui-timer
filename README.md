@@ -4,6 +4,8 @@ _Disclosure: This is predominantly AI generated software, specifically from Clau
 
 A simple terminal-based stopwatch and countdown timer built with Go and Bubble Tea. Predominantly to provide a way to set timers & use a stopwatch without moving out of the context of the terminal. Mostly born out of a desire to avoid using the default timer/stopwatch apps on more OS's, which are sometimes a bit clunky to work with.
 
+![Timer Example](imgs/demo.gif)
+
 ## Features
 
 - **Stopwatch Mode**: Track elapsed time with centisecond precision
