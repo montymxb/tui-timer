@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -90,8 +92,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if m.duration <= 0 {
 					m.duration = 0
 					m.state = stateFinished
-					// Bell character for terminal beep
+					// bell character for terminal beep
 					fmt.Print("\a")
+					sendNotification("Timer", "Time's up!")
 					return m, nil
 				}
 			}
@@ -326,6 +329,18 @@ func parseDuration(s string) (time.Duration, error) {
 	}
 
 	return total, nil
+}
+
+// sendNotification sends a desktop notification using platform-native tools.
+// Falls back silently if the notification command is unavailable.
+func sendNotification(title, message string) {
+	switch runtime.GOOS {
+	case "darwin":
+		script := fmt.Sprintf(`display notification "%s" with title "%s"`, message, title)
+		exec.Command("osascript", "-e", script).Start()
+	case "linux":
+		exec.Command("notify-send", title, message).Start()
+	}
 }
 
 func main() {
