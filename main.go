@@ -225,7 +225,7 @@ func (m model) renderTimer() string {
 	} else if m.state == stateRunning {
 		stateStr = "▶ RUNNING"
 	} else {
-		stateStr = "⏸ PAUSED"
+		stateStr = " ⏸ PAUSED"
 	}
 
 	stateStyle := lipgloss.NewStyle().
@@ -244,7 +244,7 @@ func (m model) renderTimer() string {
 	}
 
 	bar := strings.Repeat("█", filled) + strings.Repeat("░", barWidth-filled)
-	percentStr := fmt.Sprintf("%.0f%%", percentage*100)
+	percentStr := fmt.Sprintf("%.02f%%", percentage*100)
 	progressBar := progressStyle.Render(fmt.Sprintf("%s %s", bar, percentStr))
 
 	// Build content
