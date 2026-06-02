@@ -63,24 +63,29 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c", "esc":
 			return m, tea.Quit
 		case " ":
-			if m.state == stateFinished {
-				return m, nil
-			}
-			if m.state == stateRunning {
+			if m.state == stateRunning || m.state == stateFinished {
 				m.state = statePaused
 			} else {
-				m.state = stateRunning
+				if m.mode == modeTimer && m.duration <= 0 {
+					m.state = stateFinished
+				} else {
+					m.state = stateRunning
+				}
 				m.lastTick = time.Now()
 			}
 			return m, nil
 		case "r":
-			m.duration = 0
+			if m.mode == modeStopwatch {
+				m.duration = 0
+			} else {
+				m.duration = m.targetTime
+			}
 			m.state = statePaused
 			return m, nil
 		}
 
 	case tickMsg:
-		if m.state == stateRunning {
+		if m.state == stateRunning || m.state == stateFinished {
 			now := time.Time(msg)
 			elapsed := now.Sub(m.lastTick)
 			m.lastTick = now
@@ -89,13 +94,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.duration += elapsed
 			} else {
 				m.duration -= elapsed
-				if m.duration <= 0 {
-					m.duration = 0
+				if m.duration <= 0 && m.state == stateRunning {
 					m.state = stateFinished
 					// bell character for terminal beep
 					fmt.Print("\a")
 					sendNotification("Timer", "Time's up!")
-					return m, nil
 				}
 			}
 		}
@@ -180,7 +183,7 @@ func (m model) renderStopwatch() string {
 func (m model) renderTimer() string {
 	// Dynamic colors based on time remaining
 	var color string
-	if m.state == stateFinished {
+	if m.duration <= 0 {
 		color = "196" // Red
 	} else {
 		percentage := float64(m.duration) / float64(m.targetTime)
@@ -220,8 +223,12 @@ func (m model) renderTimer() string {
 
 	// State indicator
 	var stateStr string
-	if m.state == stateFinished {
-		stateStr = "🔔 TIME'S UP!"
+	if m.duration <= 0 {
+		if m.state == statePaused {
+			stateStr = "⏸ EXPIRED (PAUSED)"
+		} else {
+			stateStr = "🔔 TIME'S UP!"
+		}
 	} else if m.state == stateRunning {
 		stateStr = "▶ RUNNING"
 	} else {
@@ -234,6 +241,9 @@ func (m model) renderTimer() string {
 
 	// Progress bar
 	percentage := float64(m.duration) / float64(m.targetTime)
+	if (percentage <= 0) {
+		percentage = 0;
+	}
 	barWidth := 40
 	filled := int(percentage * float64(barWidth))
 	if filled > barWidth {
@@ -277,6 +287,12 @@ func (m model) renderTimer() string {
 }
 
 func formatDuration(d time.Duration, showMillis bool) string {
+	sign := ""
+	if d < 0 {
+		sign = "-"
+		d = -d
+	}
+
 	d = d.Round(10 * time.Millisecond)
 	h := d / time.Hour
 	d -= h * time.Hour
@@ -287,9 +303,9 @@ func formatDuration(d time.Duration, showMillis bool) string {
 	ms := d / (10 * time.Millisecond)
 
 	if showMillis {
-		return fmt.Sprintf("%02d:%02d:%02d.%02d", h, m, s, ms)
+		return fmt.Sprintf("%s%02d:%02d:%02d.%02d", sign, h, m, s, ms)
 	}
-	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
+	return fmt.Sprintf("%s%02d:%02d:%02d", sign, h, m, s)
 }
 
 func parseDuration(s string) (time.Duration, error) {
