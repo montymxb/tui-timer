@@ -40,10 +40,17 @@ type model struct {
 }
 
 type tickMsg time.Time
+type chimeMsg struct{}
 
 func tick() tea.Cmd {
 	return tea.Tick(10*time.Millisecond, func(t time.Time) tea.Msg {
 		return tickMsg(t)
+	})
+}
+
+func chime() tea.Cmd {
+	return tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
+		return chimeMsg{}
 	})
 }
 
@@ -65,15 +72,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case " ":
 			if m.state == stateRunning || m.state == stateFinished {
 				m.state = statePaused
+				return m, nil
 			} else {
+				var cmd tea.Cmd
 				if m.mode == modeTimer && m.duration <= 0 {
 					m.state = stateFinished
+					cmd = chime()
 				} else {
 					m.state = stateRunning
 				}
 				m.lastTick = time.Now()
+				return m, cmd
 			}
-			return m, nil
 		case "r":
 			if m.mode == modeStopwatch {
 				m.duration = 0
@@ -85,6 +95,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tickMsg:
+		var cmd tea.Cmd
 		if m.state == stateRunning || m.state == stateFinished {
 			now := time.Time(msg)
 			elapsed := now.Sub(m.lastTick)
@@ -96,13 +107,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.duration -= elapsed
 				if m.duration <= 0 && m.state == stateRunning {
 					m.state = stateFinished
-					// bell character for terminal beep
-					fmt.Print("\a")
+					playSound()
 					sendNotification("Timer", "Time's up!")
+					cmd = chime()
 				}
 			}
 		}
-		return m, tick()
+		return m, tea.Batch(tick(), cmd)
+
+	case chimeMsg:
+		if m.mode == modeTimer && m.state == stateFinished {
+			playSound()
+			return m, chime()
+		}
+		return m, nil
 	}
 
 	return m, nil
@@ -356,6 +374,21 @@ func sendNotification(title, message string) {
 		exec.Command("osascript", "-e", script).Start()
 	case "linux":
 		exec.Command("notify-send", title, message).Start()
+	}
+}
+
+// playSound plays an attention-getting sound or terminal bell.
+func playSound() {
+	switch runtime.GOOS {
+	case "darwin":
+		// Use a built-in macOS sound
+		exec.Command("afplay", "/System/Library/Sounds/Glass.aiff").Start()
+	case "windows":
+		// Use powershell to play a beep on windows
+		exec.Command("powershell", "-c", "[console]::beep(440,500)").Start()
+	default:
+		// Fallback to terminal bell for Linux and others
+		fmt.Print("\a")
 	}
 }
 
