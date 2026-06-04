@@ -395,7 +395,6 @@ func sendNotification(title, message string) {
 				"-title", title,
 				"-message", message,
 				"-sound", "default",
-				"-appIcon", "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Clock.icns",
 				"-activate", terminalBundleID(),
 			).Start()
 			return
