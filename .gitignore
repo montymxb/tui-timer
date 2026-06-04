@@ -9,3 +9,5 @@ result-*
 *.o
 *.a
 *.so
+
+.DS_Store
