@@ -365,11 +365,42 @@ func parseDuration(s string) (time.Duration, error) {
 	return total, nil
 }
 
+// terminalBundleID returns the macOS bundle identifier for the current terminal app.
+func terminalBundleID() string {
+	bundleIDs := map[string]string{
+		"ghostty":        "com.mitchellh.ghostty",
+		"iTerm.app":      "com.googlecode.iterm2",
+		"Apple_Terminal":  "com.apple.Terminal",
+		"WezTerm":        "com.wez.wezterm",
+		"Alacritty":      "org.alacritty",
+		"kitty":          "net.kovidgoyal.kitty",
+	}
+
+	termProgram := os.Getenv("TERM_PROGRAM")
+	if id, ok := bundleIDs[termProgram]; ok {
+		return id
+	}
+	return "com.apple.Terminal"
+}
+
 // sendNotification sends a desktop notification using platform-native tools.
+// On macOS, prefers terminal-notifier so clicking "Show" activates the terminal.
 // Falls back silently if the notification command is unavailable.
 func sendNotification(title, message string) {
 	switch runtime.GOOS {
 	case "darwin":
+		// prefer terminal-notifier: supports click-to-activate and icons
+		if path, err := exec.LookPath("terminal-notifier"); err == nil {
+			exec.Command(path,
+				"-title", title,
+				"-message", message,
+				"-sound", "default",
+				"-appIcon", "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Clock.icns",
+				"-activate", terminalBundleID(),
+			).Start()
+			return
+		}
+		// fallback to osascript
 		script := fmt.Sprintf(`display notification "%s" with title "%s"`, message, title)
 		exec.Command("osascript", "-e", script).Start()
 	case "linux":

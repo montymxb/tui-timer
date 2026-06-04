@@ -115,6 +115,7 @@ timer 2h15m30s
 
 - Go 1.21 or later
 - Terminal with color support
+- **macOS**: [`terminal-notifier`](https://github.com/julienXX/terminal-notifier) for click-to-focus notifications on timer completion (`brew install terminal-notifier`). Falls back to basic `osascript` notifications if not installed.
 
 ## Dependencies
 
